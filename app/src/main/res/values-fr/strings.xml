@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Votre épee Twitch</string>
+    <string name="title_activity_about_tab">Page à propos</string>
+    <string name="About">A propos</string>
+    <string name="SocialMedia">Media sociaux</string>
+    <string name="chosenewchannel">Choisir une autre chaine</string>
+    <string name="legal">Légal</string>
+    <string name="legalcontent">Icônes : \nmaterial.io www.flaticon.com/authors/pixel-perfect
+        \n\nLibrairie: \ngithub.com/studioidan/HttpAgent</string>
+    <string name="connectionErrorHTML">Connection impossible</string>
+    <string name="twitchUnjoinableHTML">Impossible de joindre les serveurs de Twitch, verifiez votre connexion et redemarrez l\'application</string>
+    <string name="save">Sauver</string>
+    <string name="channelname">Nom de la chaine a rejoindre</string>
+    <string name="name">Nom</string>
+    <string name="connect">Connecter</string>
+    <string name="errorchannelvoid">Veuillez entrer un nom de chaine</string>
+    <string name="reason">Raison</string>
+    <string name="dayin1letter">j</string>
+    <string name="weekin1letter">Sem.</string>
+    <string name="aboutdev">A propos du dev</string>
+    <string name="aboutapp">A propos de l\'app</string>
+    <string name="appexplainations">
+        Cette application vous aide a appliquer vos droits de moderations sur un chat twitch. Le
+        premier avantage de cette application est l\'interface : avec vous n\'aurez plus besoin de
+        votre clavier que pour tapper les raisons des TO/ban, et vous n\'aurez plus jamais besoin
+        d\'ecrire "/timeout", "/ban" ou "!permit", juste appuyer sur deux boutons. Le second
+        avantage est la selection multiple : vous pouvez bannir presque autant d\'utilisateurs que
+        vous voullez avec seulement un bouton (Attention tout de meme, en tant que moderateur Twitch
+        vous autorise 100 messsages par 30 secondes, soyez sur de ne pas depasser sans quoi vous
+        serrez ban 30 minutes de tout chat Twitch.tv… Je vais essayer d\'ajouter un indicateur a
+        la prochaine MàJ). Enfin, dernier avantage mais pas des moindres, VOUS choisissez quand le
+        chat bouge (sur l\'app en tout cas… jusqu\'a preuve du contraire l\'application ne fige pas
+        le chat de Twitch.tv…), et cela peut etre utilie sur un chat très actif… ca empeche de
+        bannir une personne au hazard parce-que le chat bouge trop vite…\n
+        Dernière chose: l\'app ne montre qu\'un objet par utilisateur, par consequent, seul le
+        dernier message de chaque utilisateur est affiché, donc je vous encourage a l\'utiliser à
+        coté de votre ordinateur, sinon vous ne verrez pas les spam…
+        \n\nUsage:\n
+        Appuyez sur le(s) utilisateur(s) à TO/Ban/Permit, si besoin entrez une raison et/ou reglez
+        le temps (avec le slider en haut de l\'ecrant), et appuyez sur le bouton de l\'action à
+        effectuer (Ban/Permit/TO).\n
+        Astuce: si vous ne trouvez pas le bon temps pour le timeout, mettez le slider du temps le
+        plus a droite, et vous pourrez mettre votre durée.
+    </string>
+</resources>

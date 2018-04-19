@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">Your Twitch sword</string>
+    <string name="title_activity_about_tab">AboutTab</string>
+    <string name="About">About</string>
+    <string name="ethaddr" translatable="false">0x55dF1Ea2933AEb271fFae56AE8f464A5AC23a3b1</string>
+    <string name="SocialMedia">Socials medias</string>
+    <string name="chosenewchannel">Chose an other channel</string>
+    <string name="legal">Legal</string>
+    <string name="legalcontent">Icons : \nmaterial.io \nwww.flaticon.com/authors/pixel-perfect
+        \n\nLibrary: \ngithub.com/studioidan/HttpAgent</string>
+    <string name="connectionErrorHTML">Impossible connection</string>
+    <string name="twitchUnjoinableHTML">Impossible to join Twitch\'s server ; verify your internet connection, and restart the app</string>
+    <string name="save">Save</string>
+    <string name="channelname">Name of the channel to join</string>
+    <string name="name">Name</string>
+    <string name="connect">Connect</string>
+    <string name="errorchannelvoid">Please enter a channel name</string>
+    <string name="reason">Reason</string>
+    <string name="dayin1letter">d</string>
+    <string name="weekin1letter">w</string>
+    <string name="aboutdev">About dev</string>
+    <string name="aboutapp">About App</string>
+    <string name="appexplainations">This app is an app to help you to apply your moderation rights
+        on a Twitch chat. The first advantage of this app, is the UI : with it, you\'ll almost never
+        need to take your keyboard (only for typing reasons of TO/Ban), and you\'ll never have to
+        write "/timeout", "/ban" or "!permit" anymore, just tap on two buttons. The second
+        advantage, is the multiple selection : you can ban almost as much users as you want in only
+        one tap (As a moderator, Twitch keeps you to send more than 100 messages/commands per 30
+        seconds, be sure to send less without what you\'ll be timeout from all Twitch.tv for 30
+        minutes… I may add an indicator in the next update). And the last but not least, YOU chose
+        when chat moves (at least on app), and it\'s useful on very active chatrooms… it prevent
+        from ban random people just because the chat moves too quickly\n
+        Last thing: the app shows an object for each users, only the last message is shown, so I
+        encourage you to use it beside your computer without what you\'ll not see spam…
+        \n\nUsage:\n
+        Tap on user(s) that you want to Ban/TO/Permit, set the reason and the time (with the slider
+        at the top of the screen) if needed, and tap on the action you want to preform
+        (Ban/Permit/TO).\n
+        Tip : if you don\'t find the right Timeout duration, put the slider far
+        right, and you\'ll be able to set your custom timeout.
+    </string>
+</resources>
