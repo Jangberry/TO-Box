@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Your Twitch sword</string>
+    <string name="app_name">TO Box</string>
     <string name="title_activity_about_tab">AboutTab</string>
     <string name="About">About</string>
     <string name="ethaddr" translatable="false">0x55dF1Ea2933AEb271fFae56AE8f464A5AC23a3b1</string>

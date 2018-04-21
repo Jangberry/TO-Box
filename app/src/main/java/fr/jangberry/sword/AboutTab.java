@@ -1,4 +1,4 @@
-package fr.jangberry.twitchsword;
+package fr.jangberry.sword;
 
 import android.content.Intent;
 import android.net.Uri;

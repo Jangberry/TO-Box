@@ -1,4 +1,4 @@
-package fr.jangberry.twitchsword;
+package fr.jangberry.sword;
 
 public class MessageObject {
     private String message;

@@ -16,36 +16,10 @@
                             <entry key="launcher">
                               <value>
                                 <PersistentState>
-                                  <option name="children">
-                                    <map>
-                                      <entry key="backgroundImage">
-                                        <value>
-                                          <PersistentState>
-                                            <option name="values">
-                                              <map>
-                                                <entry key="scalingPercent" value="70" />
-                                              </map>
-                                            </option>
-                                          </PersistentState>
-                                        </value>
-                                      </entry>
-                                      <entry key="foregroundImage">
-                                        <value>
-                                          <PersistentState>
-                                            <option name="values">
-                                              <map>
-                                                <entry key="scalingPercent" value="70" />
-                                              </map>
-                                            </option>
-                                          </PersistentState>
-                                        </value>
-                                      </entry>
-                                    </map>
-                                  </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="backgroundImage" value="D:\Matthieu\Documents\Repos\Twitchsword\Icon_0001_Rectangle-1.png" />
-                                      <entry key="foregroundImage" value="D:\Matthieu\Documents\Repos\Twitchsword\Icon_0000_thK1YUJ5DH.png" />
+                                      <entry key="backgroundImage" value="D:\Matthieu\Documents\Repos\Twitchsword\icon_0001_Background.png" />
+                                      <entry key="foregroundImage" value="D:\Matthieu\Documents\Repos\Twitchsword\icon_0000_Foreground.png" />
                                     </map>
                                   </option>
                                 </PersistentState>
