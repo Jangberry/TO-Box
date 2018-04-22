@@ -21,15 +21,18 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SocketService extends Service {private final IBinder mBinder = new LocalBinder();
+public class SocketService extends Service {
+    private final IBinder mBinder = new LocalBinder();
     public Boolean logged = false;
     Socket socket = new Socket();
     BufferedReader in;
     PrintWriter out;
     String username;
     String channel;
+    List<MessageObject> lastMessages = new ArrayList<>();
 
-    public SocketService() {}
+    public SocketService() {
+    }
 
     protected void setChannel(String incoming) {
         channel = incoming;
@@ -48,11 +51,9 @@ public class SocketService extends Service {private final IBinder mBinder = new 
         new SendThread("PRIVMSG #" + channel + " :" + message + "\r\n").start();
     }
 
-    List<MessageObject> lastMessages = new ArrayList<>();
-
     void onRecv(String message) {
         //Log.v("MSG recu", message);                   //Commented because of the spam created with
-        MessageObject incomming = new MessageObject(message.substring(1, message.indexOf("!")), message.substring(message.indexOf(":", 1)+1));
+        MessageObject incomming = new MessageObject(message.substring(1, message.indexOf("!")), message.substring(message.indexOf(":", 1) + 1));
         /*                                                   _________/  _________________/                                            /
                                                             |           |                                                             |
         Typical twitch incoming message :                   :nrandolph99!nrandolph99@nrandolph99.tmi.twitch.tv PRIVMSG #katjawastaken :yeah
@@ -80,6 +81,11 @@ public class SocketService extends Service {private final IBinder mBinder = new 
 
     }
 
+    public void newChannel(String channel) {
+        logged = false;
+        new NewChannel(channel).start();
+    }
+
     public class LocalBinder extends Binder {
         SocketService getService() {
             return SocketService.this;
@@ -93,9 +99,11 @@ public class SocketService extends Service {private final IBinder mBinder = new 
          *   new SendThread(String).start();
          */
         String message;
+
         SendThread(String message) {
             this.message = message;
         }
+
         public void run() {
             out.println(message);
             Log.v("SendThread", "Sent>" + message);
@@ -126,11 +134,10 @@ public class SocketService extends Service {private final IBinder mBinder = new 
                                     (!recv.equals("")
                                     && !recv.substring(0, 4).equals("PING")
                                     && !recv.substring(1, 14).equals("tmi.twitch.tv")
-                                    && !(recv.contains(".tmi.twitch.tv JOIN #"+channel) &&
-                                         recv.substring(1, recv.indexOf("!")).equals(username))
+                                    && !(recv.contains(".tmi.twitch.tv JOIN #" + channel) &&
+                                    recv.substring(1, recv.indexOf("!")).equals(username))
                                     && !(recv.contains(".tmi.twitch.tv PART #") &&
-                                         recv.substring(1, recv.indexOf("!")).equals(username)))
-                            {
+                                    recv.substring(1, recv.indexOf("!")).equals(username))) {
                                 onRecv(recv);
                             } else if (recv.substring(0, 4).equals("PING")) {
                                 new SendThread("PONG").start();
@@ -151,11 +158,6 @@ public class SocketService extends Service {private final IBinder mBinder = new 
                 }
             }
         }
-    }
-
-    public void newChannel(String channel) {
-        logged = false;
-        new NewChannel(channel).start();
     }
 
     public class NewChannel extends Thread {
@@ -213,7 +215,8 @@ public class SocketService extends Service {private final IBinder mBinder = new 
                                                     setUsername(jsonResults.getJSONObject("token")
                                                             .get("user_name")
                                                             .toString());
-                                                } catch (org.json.JSONException e) {}
+                                                } catch (org.json.JSONException e) {
+                                                }
                                             } else {
                                                 Log.e("HTTP", "error");
                                             }

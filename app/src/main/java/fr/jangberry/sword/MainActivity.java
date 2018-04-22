@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
     protected static final String clientID = "1usq907ae5z2wpjr6648fydgsjwqh1";
     private static final String savedData_Location = "fr.jangberry.twitchsword.prefs";
     private static final String apiScopes = "chat_login";
-    private SocketService socketservice;
     String channel;
     String token;
     Boolean changinChannel = false;
@@ -42,6 +41,22 @@ public class MainActivity extends AppCompatActivity {
                         1 = choosing channel
                         2 = MainLayout
                         */
+    private SocketService socketservice;
+    protected ServiceConnection serviceconnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            SocketService.LocalBinder binder = (SocketService.LocalBinder) service;
+            socketservice = binder.getService();
+            //mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            //mBound = false;
+        }
+
+    };
     private RecyclerView usersRecycler;
     private List<MessageObject> usersObject = new ArrayList<>();
     private List<String> selected = new ArrayList<>();
@@ -68,22 +83,6 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    protected ServiceConnection serviceconnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            SocketService.LocalBinder binder = (SocketService.LocalBinder) service;
-            socketservice = binder.getService();
-            //mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            //mBound = false;
-        }
-
-    };
 
     Boolean checkLogged() {
         return socketservice.logged;
@@ -210,6 +209,104 @@ public class MainActivity extends AppCompatActivity {
         unbindService(serviceconnection);
     }
 
+    private void setButton() {
+        TextView buttonTO = findViewById(R.id.buttonTO);
+        if (intTOduration < 60) {
+            buttonTO.setText(intTOduration + "s");
+        } else if (intTOduration < 3600) {
+            buttonTO.setText(intTOduration / 60 + "m");
+        } else if (intTOduration < 86400) {
+            buttonTO.setText(intTOduration / 60 / 60 + "h");
+        } else if (intTOduration < 604800) {
+            buttonTO.setText(intTOduration / 60 / 60 / 24 + getString(R.string.dayin1letter));
+        } else {
+            buttonTO.setText(intTOduration / 60 / 60 / 24 / 7 + getString(R.string.weekin1letter));
+        }
+    }
+
+    public void onRefresh(@Nullable View view) {
+        List<MessageObject> list = socketservice.lastMessages;
+        int i;
+        for (i = 0; i < list.size(); i++) {
+            MessageObject message = list.get(i);
+            if (usersString.contains(message.getUsername())) {
+                usersObject.remove(usersString.indexOf(message.getUsername()));
+                usersString.remove(usersString.indexOf(message.getUsername()));
+            }
+            usersObject.add(0, message);
+            usersString.add(0, message.getUsername());
+        }
+        selected.clear();
+        socketservice.lastMessages.clear();
+        updateSelectedUsers();
+        usersRecycler.setAdapter(new MyAdapter(usersObject));
+    }
+
+    public void onUserSelected(View view) {
+        if (selected.contains(view.getContentDescription().toString())) {
+            view.setBackground(getDrawable(R.color.cardUnselected));
+            selected.remove(view.getContentDescription().toString());
+        } else {
+            view.setBackground(getDrawable(R.color.cardSelected));
+            selected.add(view.getContentDescription().toString());
+        }
+        updateSelectedUsers();
+    }
+
+    private void updateSelectedUsers() {
+        TextView view = findViewById(R.id.SelectedUser);
+        String string = "";
+        int i;
+        for (i = 0; i < selected.size(); i++) {
+            string += selected.get(i);
+            if (selected.size() > 1 && i != selected.size() - 1) {
+                string += "; ";
+            }
+        }
+        view.setText(string);
+    }
+
+    public void onTO(View view) {
+        int i;
+        TextView reason = findViewById(R.id.Reason);
+        for (i = 0; i < selected.size(); i++) {
+            String string = "/timeout ";
+            string += selected.get(i) + " ";
+            string += intTOduration + " ";
+            string += reason.getText();
+            socketservice.send(string);
+            usersObject.remove(usersString.indexOf(selected.get(i)));
+            usersString.remove(selected.get(i));
+        }
+        onRefresh(null);
+    }
+
+    public void onBan(View view) {
+        int i;
+        TextView reason = findViewById(R.id.Reason);
+        for (i = 0; i < selected.size(); i++) {
+            String string = "/ban ";
+            string += selected.get(i) + " ";
+            string += reason.getText();
+            socketservice.send(string);
+            usersObject.remove(usersString.indexOf(selected.get(i)));
+            usersString.remove(selected.get(i));
+        }
+        onRefresh(null);
+    }
+
+    public void onPremit(View view) {
+        int i;
+        for (i = 0; i < selected.size(); i++) {
+            String string = "!permit ";
+            string += selected.get(i) + " ";
+            socketservice.send(string);
+            usersObject.remove(usersString.indexOf(selected.get(i)));
+            usersString.remove(selected.get(i));
+        }
+        onRefresh(null);
+    }
+
     class ChangeViewChecker extends Thread {
         @Override
         public void run() {
@@ -314,105 +411,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-    }
-
-    private void setButton() {
-        TextView buttonTO = findViewById(R.id.buttonTO);
-        if (intTOduration < 60) {
-            buttonTO.setText(intTOduration + "s");
-        } else if (intTOduration < 3600) {
-            buttonTO.setText(intTOduration / 60 + "m");
-        } else if (intTOduration < 86400) {
-            buttonTO.setText(intTOduration / 60 / 60 + "h");
-        } else if (intTOduration < 604800) {
-            buttonTO.setText(intTOduration / 60 / 60 / 24 + getString(R.string.dayin1letter));
-        } else {
-            buttonTO.setText(intTOduration / 60 / 60 / 24 / 7 + getString(R.string.weekin1letter));
-        }
-    }
-
-    public void onRefresh(@Nullable View view) {
-        List<MessageObject> list = socketservice.lastMessages;
-        int i;
-        for (i = 0; i < list.size(); i++) {
-            MessageObject message = list.get(i);
-            if (usersString.contains(message.getUsername())) {
-                usersObject.remove(usersString.indexOf(message.getUsername()));
-                usersString.remove(usersString.indexOf(message.getUsername()));
-            }
-            usersObject.add(0, message);
-            usersString.add(0, message.getUsername());
-        }
-        selected.clear();
-        socketservice.lastMessages.clear();
-        updateSelectedUsers();
-        usersRecycler.setAdapter(new MyAdapter(usersObject));
-    }
-
-
-    public void onUserSelected(View view) {
-        if (selected.contains(view.getContentDescription().toString())) {
-            view.setBackground(getDrawable(R.color.cardUnselected));
-            selected.remove(view.getContentDescription().toString());
-        } else {
-            view.setBackground(getDrawable(R.color.cardSelected));
-            selected.add(view.getContentDescription().toString());
-        }
-        updateSelectedUsers();
-    }
-
-    private void updateSelectedUsers(){
-        TextView view = findViewById(R.id.SelectedUser);
-        String string = "";
-        int i;
-        for(i = 0; i<selected.size(); i++){
-            string += selected.get(i);
-            if(selected.size()>1 && i != selected.size() - 1){
-                string += "; ";
-            }
-        }
-        view.setText(string);
-    }
-
-    public void onTO(View view){
-        int i;
-        TextView reason = findViewById(R.id.Reason);
-        for(i = 0; i<selected.size(); i++){
-            String string = "/timeout ";
-            string += selected.get(i) + " ";
-            string += intTOduration + " ";
-            string += reason.getText();
-            socketservice.send(string);
-            usersObject.remove(usersString.indexOf(selected.get(i)));
-            usersString.remove(selected.get(i));
-        }
-        onRefresh(null);
-    }
-
-    public void onBan(View view){
-        int i;
-        TextView reason = findViewById(R.id.Reason);
-        for(i = 0; i<selected.size(); i++){
-            String string = "/ban ";
-            string += selected.get(i) + " ";
-            string += reason.getText();
-            socketservice.send(string);
-            usersObject.remove(usersString.indexOf(selected.get(i)));
-            usersString.remove(selected.get(i));
-        }
-        onRefresh(null);
-    }
-
-    public void onPremit(View view){
-        int i;
-        for(i = 0; i<selected.size(); i++){
-            String string = "!permit ";
-            string += selected.get(i) + " ";
-            socketservice.send(string);
-            usersObject.remove(usersString.indexOf(selected.get(i)));
-            usersString.remove(selected.get(i));
-        }
-        onRefresh(null);
     }
 
     public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {

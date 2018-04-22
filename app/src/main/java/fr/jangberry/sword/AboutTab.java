@@ -51,10 +51,13 @@ public class AboutTab extends AppCompatActivity {
     public void onEth(View view) {
         try {
             View ethaddr = findViewById(R.id.ethaddr);
+            View paypaladdr = findViewById(R.id.Paypal_address);
             if (ethaddr.getVisibility() == View.GONE) {
                 ethaddr.setVisibility(View.VISIBLE);
+                paypaladdr.setVisibility(View.VISIBLE);
             } else {
                 ethaddr.setVisibility(View.GONE);
+                paypaladdr.setVisibility(View.GONE);
             }
         } catch (Exception e) {
             Log.e("inent", "", e);

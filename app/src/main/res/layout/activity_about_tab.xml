@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="fr.jangberry.sword.AboutTab"
-    android:animateLayoutChanges="true">
+    android:animateLayoutChanges="true"
+    tools:context="fr.jangberry.sword.AboutTab">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -114,6 +114,17 @@
                 app:layout_constraintTop_toBottomOf="@+id/ether" />
 
             <TextView
+                android:id="@+id/Paypal_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/mypapayladress"
+                android:textSize="14sp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ethaddr" />
+
+            <TextView
                 android:id="@+id/appexplainations"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -139,7 +150,7 @@
                 android:textSize="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ethaddr" />
+                app:layout_constraintTop_toBottomOf="@+id/Paypal_address" />
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar_about"
