@@ -6,13 +6,17 @@ android {
         applicationId "fr.jangberry.sword"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 2
-        versionName "1.0"
+        versionCode 3
+        versionName "1.1"
         versionNameSuffix " - Coaster"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        releaseGithub {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -26,4 +30,5 @@ dependencies {
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.studioidan.httpagent:httpagent:1.0.14@aar'
     implementation 'com.android.support:cardview-v7:26.1.0'
+    implementation 'com.google.android.gms:play-services-ads:15.0.0'
 }

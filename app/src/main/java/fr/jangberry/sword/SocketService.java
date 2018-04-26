@@ -4,42 +4,32 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
-import com.studioidan.httpagent.HttpAgent;
-import com.studioidan.httpagent.JsonCallback;
-
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SocketService extends Service {
     private final IBinder mBinder = new LocalBinder();
-    public Boolean logged = false;
-    Socket socket = new Socket();
-    BufferedReader in;
-    PrintWriter out;
-    String username;
-    String channel;
     List<MessageObject> lastMessages = new ArrayList<>();
+    private ConnectionManager cm = new ConnectionManager();
 
     public SocketService() {
     }
 
-    protected void setChannel(String incoming) {
-        channel = incoming;
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        new ConnectSocketThread().start();
+        new RecvThread().start();
     }
 
-    protected void setUsername(String incoming) {
-        username = incoming;
+
+    public boolean isConnectedToChannel() {
+        return cm.isConnectedToChannel();
     }
 
     @Override
@@ -48,7 +38,7 @@ public class SocketService extends Service {
     }
 
     public void send(String message) {
-        new SendThread("PRIVMSG #" + channel + " :" + message + "\r\n").start();
+        new SendThread("PRIVMSG #" + cm.getChannel() + " :" + message + "\r\n").start();
     }
 
     void onRecv(String message) {
@@ -62,29 +52,56 @@ public class SocketService extends Service {
                                                                                                                     This is channel name
          */
         lastMessages.add(incomming);
+        if (BuildConfig.DEBUG) {
+            Log.v("recv", "<" + message);
+        }
     }
 
     public void socketConnect(String token) {
-        new ConnectThread(token).start();
+        cm.setToken(token);
+        new connectThread().start();
     }
 
     public void onDestroy() {
         super.onDestroy();
-        try {
-            socket.close();
-            Log.i("SocketService", "Socket closed");
-        } catch (IOException e) {
-            Log.e("e", "IO", e);
-        } catch (NullPointerException e) {
-            Log.i("SocketService", "Socket not opened");
+        cm.disconnect();
+    }
+
+    public void setChannel(String channel) {
+        if (channel != null) {
+            new SetChannel(channel).start();
+        }
+    }
+
+    public class SetChannel extends Thread {
+        String channel;
+
+        SetChannel(String channel) {
+            this.channel = channel;
         }
 
+        public void run() {
+            cm.setChannel(channel);
+            cm.joinChannel();
+        }
     }
 
-    public void newChannel(String channel) {
-        logged = false;
-        new NewChannel(channel).start();
+    class ConnectSocketThread extends Thread {
+        @Override
+        public void run() {
+            super.run();
+            cm.connectSocket();
+        }
     }
+
+    class connectThread extends Thread {
+        @Override
+        public void run() {
+            super.run();
+            cm.loginTwitch();
+        }
+    }
+
 
     public class LocalBinder extends Binder {
         SocketService getService() {
@@ -93,11 +110,6 @@ public class SocketService extends Service {
     }
 
     class SendThread extends Thread {
-        /*
-         *   Usage
-         *
-         *   new SendThread(String).start();
-         */
         String message;
 
         SendThread(String message) {
@@ -105,147 +117,55 @@ public class SocketService extends Service {
         }
 
         public void run() {
-            out.println(message);
-            Log.v("SendThread", "Sent>" + message);
+            cm.rawSend(message);
         }
     }
 
     class RecvThread extends Thread {
-        /*
-         *  Usage:
-         *
-         *  Just launch the thread : there is an infinity loop that receive messages, and call
-         *  the onRecv
-         */
         public void run() {
-            Boolean keepReceiving = true;
-            while (keepReceiving) {
-                try {
-                    while (socket.isConnected()) {
+            try {
+                while (cm.isActive()) {
+                    while (!cm.isSocketConnected()) {
+                        sleep(10);
+                    }
+                    while (cm.isSocketConnected()) {
                         String recv = null;
-                        while (recv == null && socket.isConnected()) {
-                            if (!keepReceiving) {
-                                sleep(1000);
+                        while (recv == null && cm.isSocketConnected()) {
+                            try {
+                                recv = cm.read();
+                            } catch (SocketException e) {
+                                Looper.prepare();
+                                Toast.makeText(SocketService.this, R.string.reconnect, Toast.LENGTH_LONG).show();
                             }
-                            recv = in.readLine();
                         }
-                        try {
-                            if
-                                    (!recv.equals("")
+                        if (cm.isSocketConnected()) {
+                            if (!recv.equals("")
                                     && !recv.substring(0, 4).equals("PING")
                                     && !recv.substring(1, 14).equals("tmi.twitch.tv")
-                                    && !(recv.contains(".tmi.twitch.tv JOIN #" + channel) &&
-                                    recv.substring(1, recv.indexOf("!")).equals(username))
+                                    && !(recv.contains(".tmi.twitch.tv JOIN #" + cm.getChannel()) &&
+                                    recv.substring(1, recv.indexOf("!")).equals(cm.getUsername()))
                                     && !(recv.contains(".tmi.twitch.tv PART #") &&
-                                    recv.substring(1, recv.indexOf("!")).equals(username))) {
+                                    recv.substring(1, recv.indexOf("!")).equals(cm.getUsername()))
+                                    && !recv.substring(1, cm.getUsername().length() + 15).equals(cm.getUsername() + ".tmi.twitch.tv")) {
                                 onRecv(recv);
                             } else if (recv.substring(0, 4).equals("PING")) {
                                 new SendThread("PONG").start();
-                                Log.d("RecvThread", "PING-PONG");
+                                if (BuildConfig.DEBUG) {
+                                    Log.d("RecvThread", "PING-PONG");
+                                }
                             } else {
-                                Log.i("MSG", recv);
+                                if (BuildConfig.DEBUG) {
+                                    Log.i("MSG", recv);
+                                }
                             }
-                        } catch (StringIndexOutOfBoundsException e) {
                         }
                     }
-                } catch (java.net.SocketException e) {
-                    keepReceiving = false;
-                    Log.e("RecvThread", "Error", e);
-                } catch (java.io.IOException e) {
-                    Log.e("RecvThread", "Error", e);
-                } catch (java.lang.InterruptedException e) {
+                    sleep(50);
+                }
+            } catch (java.lang.InterruptedException e) {
+                if (BuildConfig.DEBUG) {
                     Log.wtf("Receving", "Thread", e);
                 }
-            }
-        }
-    }
-
-    public class NewChannel extends Thread {
-        String newChannel;
-
-        NewChannel(String newChannel) {
-            this.newChannel = newChannel;
-        }
-
-        public void run() {
-            if (!newChannel.equals(channel)) {
-                out.println("PART #" + channel);
-                channel = newChannel;
-                out.println("JOIN #" + newChannel);
-            }
-            logged = true;
-        }
-    }
-
-    class ConnectThread extends Thread {
-        String token;
-
-        ConnectThread(String token) {
-            this.token = token;
-        }
-
-        @Override
-        public void run() {
-            if (!logged || !socket.isConnected()) {
-                try {
-                    if (!socket.isConnected()) {
-                        SocketAddress socaddrs = new InetSocketAddress(
-                                "irc.chat.twitch.tv", 6667);
-                        Log.i("SocketService", "Trying to connect");
-                        socket.connect(socaddrs, 5000);
-                        if (socket.isConnected()) {
-                            out = new PrintWriter(socket.getOutputStream(), true);
-                            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                            Log.i("SocketService", "Socket connected");
-                            new RecvThread().start();
-                            out.println("PASS oauth:" + token);
-
-                            String url = "https://api.twitch.tv/kraken";
-                            HttpAgent.get(url)
-                                    .headers("client-id", MainActivity.clientID,
-                                            "Authorization", "OAuth " + token,
-                                            "Accept", "application/vnd.twitchtv.v5+json")
-                                    .goJson(new JsonCallback() {
-                                        @Override
-                                        protected void onDone(boolean success, JSONObject jsonResults) {
-                                            if (success) {
-                                                //Log.v("HTTP", "Success :" + jsonResults.toString());
-                                                // Commented because of security issues
-                                                try {
-                                                    setUsername(jsonResults.getJSONObject("token")
-                                                            .get("user_name")
-                                                            .toString());
-                                                } catch (org.json.JSONException e) {
-                                                }
-                                            } else {
-                                                Log.e("HTTP", "error");
-                                            }
-                                        }
-                                    });
-                            while (username == null) {
-                                sleep(10);
-                            }
-                            out.println("NICK " + username);
-                            Log.v("SocketService", "Username get ! It's " +
-                                    username + " and you're now logged with");
-                        }
-                    }
-                    while (channel == null) {
-                        sleep(250);
-                    }
-                    out.println("JOIN #" + channel);
-                    logged = true;
-                    Log.i("SocketService",
-                            "Now logged with username " + username +
-                                    " to channel " + channel);
-                } catch (IOException e) {
-                    Log.e("e", "IOErreur", e);
-                } catch (Exception e) {
-                    Log.e("Socket service", "", e);
-                }
-            } else {
-                Log.d("SocketService", "Already logged");
-                logged = true;
             }
         }
     }

@@ -58,6 +58,15 @@
         effectuer (Ban/Permit/TO).\n
         Astuce: si vous ne trouvez pas le bon temps pour le timeout, mettez le slider du temps le
         plus a droite, et vous pourrez mettre votre durée.
+        \n\n
+        Vous pouvez aussi vous demander pourquoi j\'ai mis une publicité sur une application avec si
+        peu d\'utilisateurs: c\'est pour m\'aider a payer la license Play Store: 25$, quand je les
+        aurais, (malheureusement je dois attendre d\'avoir généré 70€ pour reccupérer cet argent :/
+        ), je supprimerais la publicité (sauf si mon application deviens célèbre… J\'aime £\'arg€nt
+        oui… c\'€$t ma pa$$ion…).\n
+        Si vous detestez vraiment la pub (même si je pense qu\'elle est bien placée) vous pouvez
+        télécharger l\'application depuis Github, la version que j\'y poste est compilé sans pub ;).
     </string>
     <string name="mypapayladress">Ou mon adresse PayPal : matt2001@hotmail.fr</string>
+    <string name="reconnect">Erreur de connection fatale, redemarrez l\'application</string>
 </resources>

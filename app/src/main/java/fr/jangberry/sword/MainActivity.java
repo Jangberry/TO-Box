@@ -26,15 +26,15 @@ import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    protected static final String clientID = "1usq907ae5z2wpjr6648fydgsjwqh1";
-    private static final String savedData_Location = "fr.jangberry.twitchsword.prefs";
-    private static final String apiScopes = "chat_login";
     String channel;
-    String token;
     Boolean changinChannel = false;
     int currentView;    /*
                         0 = login (webview)
@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private List<String> usersString = new ArrayList<>();
     private SeekBar durationTO;
     private int intTOduration;
+    private AdView channelChoiceAdView;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -82,10 +83,6 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    Boolean checkLogged() {
-        return socketservice.logged;
     }
 
     public boolean onKeyUp(int keyCode, KeyEvent event) {
@@ -112,39 +109,60 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main_login);
+        currentView = 0;
         startService(new Intent(this, SocketService.class));
         bindService(new Intent(this, SocketService.class),
                 serviceconnection,
                 Context.BIND_AUTO_CREATE);
-        setContentView(R.layout.activity_main_login);
-        currentView = 0;
         setTitle(getString(R.string.app_name));
         String uri = "https://id.twitch.tv/oauth2/authorize" +
-                "?client_id=" + clientID +
-                "&scope=" + apiScopes +
+                "?client_id=" + Resources.clientID +
+                "&scope=" + Resources.apiScopes +
                 "&redirect_uri=http://localhost" +
                 "&response_type=token";
-        final WebView webview = findViewById(R.id.Login);
+        WebView webview = findViewById(R.id.Login);
         webview.getSettings().setJavaScriptEnabled(true);
-        webview.setWebViewClient(new WebViewClient());
+        webview.getSettings().setDomStorageEnabled(true);
+        //webview.setWebViewClient(new WebViewClient());
         webview.loadUrl(uri);
         webview.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                Log.v("URL", url);                         // Commented because of security issues
+                if (BuildConfig.DEBUG) {
+                    Log.v("URL", url);
+                }
+
                 if (url.contains("localhost/#")) {
-                    Log.i("TwitchLogin",
-                            "Logged, recovering Token, connecting to chat and setting up button view...");
-                    token = url.substring(url.indexOf("=") + 1, url.indexOf("&"));
-                    Log.v("Token", token);                 // Commented because of security issues
-                    webview.destroy();
-                    setContentView(R.layout.activity_main_chosechannel);
-                    currentView = 1;
-                    Toolbar toolbar = findViewById(R.id.toolbar_channel);
-                    setSupportActionBar(toolbar);
-                    setTitle(R.string.app_name);
-                    socketservice.socketConnect(token);
-                    new ChangeViewChecker().start();
+                    if (!socketservice.isConnectedToChannel()) {
+                        if (BuildConfig.DEBUG) {
+                            Log.i("TwitchLogin",
+                                    "Logged, recovering Token, connecting to chat and setting up button view...");
+                        }
+                        String token = url.substring(url.indexOf("=") + 1, url.indexOf("&"));
+                        if (BuildConfig.DEBUG) {
+                            Log.v("Token", token);
+                        }
+
+                        socketservice.socketConnect(token);
+                        setContentView(R.layout.activity_main_chosechannel);
+                        currentView = 1;
+                        Toolbar toolbar = findViewById(R.id.toolbar_channel);
+                        setSupportActionBar(toolbar);
+                        setTitle(R.string.app_name);
+                        if (!BuildConfig.BUILD_TYPE.equals("releaseGithub")) {
+                            MobileAds.initialize(MainActivity.this, Resources.adID);
+                            channelChoiceAdView = findViewById(R.id.adView);
+                            AdRequest.Builder adRequest = new AdRequest.Builder();
+                            if (BuildConfig.DEBUG) {
+                                adRequest.addTestDevice("3D0266CF596BA090B74E9D85DE74822E");
+                                Log.i("Debug", "Screening ad");
+                            }
+                            channelChoiceAdView.loadAd(adRequest.build());
+                        }
+                    } else {
+                        new ChangeViewChecker().start();
+                    }
                 }
                 super.onPageFinished(view, url);
             }
@@ -152,7 +170,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                 if (!failingUrl.contains("localhost/#")) {
-                    Log.v("failing url", failingUrl);
+                    if (BuildConfig.DEBUG) {
+                        Log.v("failing url", failingUrl);
+                    }
                     String htmlData =
                             "<html>" +
                                     "<body>" +
@@ -172,37 +192,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onChannelChosen(View view) {
-        /*if(channel.equals("custom")){*/
         EditText channelField = findViewById(R.id.channelField);
         channel = channelField.getText().toString().toLowerCase().replace(" ", "");
-        //}
         if (!channel.equals("")) {
-            if (!changinChannel) {
-                socketservice.setChannel(channel);
-                findViewById(R.id.channelloading).setVisibility(View.VISIBLE);
-                setTitle("...");
-            } else {
-                socketservice.newChannel(channel);
-                findViewById(R.id.channelloading).setVisibility(View.VISIBLE);
-                setTitle("...");
-                new ChangeViewChecker().start();
+            socketservice.setChannel(channel);
+            findViewById(R.id.channelloading).setVisibility(View.VISIBLE);
+            setTitle("...");
+            if (changinChannel) {
                 changinChannel = false;
+                usersObject.clear();
+                usersString.clear();
+                selected.clear();
             }
+            new ChangeViewChecker().start();
         } else {
             findViewById(R.id.textviewchannelnamerror).setVisibility(View.VISIBLE);
         }
     }
-
-
-    public void onButtonClick(View view) {
-    }
-
-
-    /*
-    public Boolean onButtonLongClick(View view) {
-
-    }
-    */
 
     protected void onDestroy() {
         super.onDestroy();
@@ -310,11 +316,13 @@ public class MainActivity extends AppCompatActivity {
     class ChangeViewChecker extends Thread {
         @Override
         public void run() {
-            while (!checkLogged()) {
+            while (!socketservice.isConnectedToChannel()) {
                 try {
                     sleep(100);
                 } catch (Exception e) {
-                    Log.v("Waiting process", "interrupted", e);
+                    if (BuildConfig.DEBUG) {
+                        Log.v("Waiting process", "interrupted", e);
+                    }
                 }
             }
             new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -457,6 +465,4 @@ public class MainActivity extends AppCompatActivity {
             message.setText(messageObject.getMessage());
         }
     }
-
-
 }

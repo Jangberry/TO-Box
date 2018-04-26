@@ -1,8 +1,8 @@
 <resources>
+    <string name="ethaddr" translatable="false">0x55dF1Ea2933AEb271fFae56AE8f464A5AC23a3b1</string>
     <string name="app_name">TO Box</string>
     <string name="title_activity_about_tab">AboutTab</string>
     <string name="About">About</string>
-    <string name="ethaddr" translatable="false">0x55dF1Ea2933AEb271fFae56AE8f464A5AC23a3b1</string>
     <string name="SocialMedia">Socials medias</string>
     <string name="chosenewchannel">Chose an other channel</string>
     <string name="legal">Legal</string>
@@ -32,8 +32,8 @@
     <string name="reason">Reason</string>
     <string name="dayin1letter">d</string>
     <string name="weekin1letter">w</string>
-    <string name="aboutdev">About dev</string>
-    <string name="aboutapp">About App</string>
+    <string name="aboutdev">About the dev</string>
+    <string name="aboutapp">About the App</string>
     <string name="appexplainations">This app is an app to help you to apply your moderation rights
         on a Twitch chat. The first advantage of this app, is the UI : with it, you\'ll almost never
         need to take your keyboard (only for typing reasons of TO/Ban), and you\'ll never have to
@@ -52,6 +52,14 @@
         (Ban/Permit/TO).\n
         Tip : if you don\'t find the right Timeout duration, put the slider far
         right, and you\'ll be able to set your custom timeout.
+        \n\n
+        You may also ask yourself why I put an ad on an app that hasn\'t so much users : it\'s to
+        help me to pay the Play Store license: 25$, when I\'ll get them (sadly I\'ll be able to get
+        then only when my app earn 70€ :/ ), I\'ll remove ad (except if my app becomes famous…
+        I £ove mon€y right… It\'$ my pa$$ion…).\n
+        If you really hate ads (even if I think it is well placed) you can download the app through
+        Github, the release I post on are compiled without ads ;).
     </string>
     <string name="mypapayladress">Or my PayPal address : matt2001@hotmail.fr</string>
+    <string name="reconnect">Connection fatal error, please restart app</string>
 </resources>
