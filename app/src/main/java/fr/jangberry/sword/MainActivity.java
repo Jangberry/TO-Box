@@ -4,15 +4,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -25,11 +26,9 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.toolbar, menu);
         return true;
     }
@@ -100,10 +98,21 @@ public class MainActivity extends AppCompatActivity {
                 setTitle(R.string.app_name);
                 TextView channelField = findViewById(R.id.channelField);
                 channelField.setText(channel);
+                if (BuildConfig.BUILD_TYPE.equals("releasePlaystore")) {
+                    MobileAds.initialize(MainActivity.this, Resources.adID);
+                    channelChoiceAdView = findViewById(R.id.adView);
+                    AdRequest adRequest = new AdRequest.Builder().build();
+                    channelChoiceAdView.loadAd(adRequest);
+                }
             }
             return true;
         }
         return super.onKeyUp(keyCode, event);
+    }
+
+    public void onClearReason(View view){
+        EditText reason = findViewById(R.id.Reason);
+        reason.setText("");
     }
 
     @Override

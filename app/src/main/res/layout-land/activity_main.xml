@@ -23,11 +23,15 @@
         android:id="@+id/buttonTO"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:onClick="onTO"
         android:text="*TO duration*"
         android:textAppearance="@style/TextAppearance.AppCompat"
+        app:layout_constraintBottom_toTopOf="@+id/buttonBan"
+        app:layout_constraintEnd_toStartOf="@+id/divider"
         app:layout_constraintStart_toEndOf="@+id/customTO"
         app:layout_constraintTop_toBottomOf="@+id/seekBarTO" />
 
@@ -39,25 +43,25 @@
         android:onClick="onBan"
         android:text="Ban"
         app:layout_constraintBaseline_toBaselineOf="@+id/buttonPermit"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/divider" />
 
     <Button
         android:id="@+id/buttonPermit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:onClick="onPremit"
         android:text="Permit"
-        app:layout_constraintBaseline_toBaselineOf="@+id/buttonTO"
-        app:layout_constraintEnd_toStartOf="@+id/buttonBan"
-        app:layout_constraintStart_toEndOf="@+id/buttonTO" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonTO" />
 
     <EditText
         android:id="@+id/Reason"
         style="@android:style/Widget.DeviceDefault.AutoCompleteTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="4dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -66,32 +70,21 @@
         android:inputType="textAutoComplete"
         android:selectAllOnFocus="true"
         android:singleLine="true"
+        app:layout_constraintBottom_toTopOf="@+id/SelectedUser"
         app:layout_constraintEnd_toStartOf="@+id/imageButton2"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonPermit" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonBan" />
 
     <TextView
         android:id="@+id/SelectedUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Reason" />
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="?android:attr/listDivider"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/SelectedUser" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/divider"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floatingActionButton"
@@ -112,21 +105,23 @@
         android:id="@+id/users"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider" />
+        app:layout_constraintStart_toEndOf="@+id/divider"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_main" />
 
     <SeekBar
         android:id="@+id/seekBarTO"
         style="@android:style/Widget.DeviceDefault.SeekBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:max="15"
         android:progress="0"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/divider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar_main" />
 
@@ -134,6 +129,7 @@
         android:id="@+id/customTO"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:ems="10"
         android:hint="s"
         android:inputType="number"
@@ -151,13 +147,26 @@
         android:layout_marginEnd="8dp"
         android:background="@android:color/transparent"
         android:contentDescription="Clear"
-        android:elevation="2dp"
+        android:elevation="0dp"
         android:fadingEdge="horizontal|vertical"
         android:fadingEdgeLength="5dp"
         android:onClick="onClearReason"
         app:layout_constraintBottom_toBottomOf="@+id/Reason"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/divider"
         app:layout_constraintTop_toTopOf="@+id/Reason"
         app:srcCompat="@drawable/ic_clear_black_24dp" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_main"
+        app:layout_constraintVertical_bias="0.665" />
 
 </android.support.constraint.ConstraintLayout>
